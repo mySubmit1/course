@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    body{
+        background-image: url("background2.jpg");
+        background-repeat: no-repeat;
+        background-size: cover;
+    }
+    #choose{
+        position: absolute;
+        top: 20%;
+        left: 80%;
+    }
+</style>
+<body>
+<table align="left" id="classesTable" border="1" width="50%">
+    <tr align="center">
+        <td colspan="5">所有课程</td>
+    </tr>
+    <tr>
+        <td>课程ID</td>
+        <td>课程名</td>
+        <td>授课老师</td>
+        <td>上课时间</td>
+        <td>选择</td>
+    </tr>
+</table>
+<table align="right" id="choseClassesTable" border="1" width="20%">
+    <!--<tr align="center">-->
+        <!--<td colspan="2">已选课程</td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+        <!--<td>课程ID</td>-->
+        <!--<td>课程名</td>-->
+    <!--</tr>-->
+    <tr align="center">
+        <td><input type="button" value="提交选课" onclick="chooseClasses()"></td>
+        </tr>
+    <tr align="center">
+        <td><input type="button" onclick="changePage()" value="回到主页面"></td>
+    </tr>
+</table>
+</body>
+<script type="text/javascript" src="jquery-3.4.0.min.js"></script>
+<script type="text/javascript">
+    var staticClasses;
+    var studentAccount;
+    //取得学生信息
+    $.ajax({
+        async:false,
+        url:"/getStudentData",
+        type:"post",
+        success:function (studentData) {
+            studentAccount = studentData[0].studentAccount;
+        },
+        error:function () {
+            alert("访问失败");
+        }
+    });
+    // 取得所有课程
+    {
+        $.ajax({
+                async:false,
+                type: "post",
+                url: "/getAllClasses",
+                success: function (classes) {
+                    alert("访问成功");
+                    staticClasses = classes;
+                    var classesTable = document.getElementById("classesTable");
+                    for (var i = 0; i < classes.length; i++) {
+                        var classTR = document.createElement("tr");
+                        var classRadio = document.createElement("input");
+                        var classTD = [];
+                        var classValue = [];
+                        classValue[0] = document.createTextNode(classes[i].courseID);
+                        classValue[1] = document.createTextNode(classes[i].courseName);
+                        classValue[2] = document.createTextNode(classes[i].courseTeacher);
+                        classValue[3] = document.createTextNode(classes[i].courseTime);
+                        for (var j = 0; j < 4; j++) {
+                            classTD[j] = document.createElement("td");
+                            classTD[j].appendChild(classValue[j]);
+                            classTR.appendChild(classTD[j]);
+                        }
+                        classTD[4] = document.createElement("td");
+                        classRadio.value = classes[i].courseID;
+                        classRadio.type = "radio";
+                        classRadio.id = classes[i].courseID.toString();
+                        classTD[4].appendChild(classRadio);
+                        classTR.appendChild(classTD[4]);
+                        classesTable.appendChild(classTR);
+                    }
+                },
+            error:function () {
+                alert("访问失败");
+            }
+        })
+    }
+    //选择并提交课程
+    function chooseClasses() {
+        var choseClassesID = "";
+        for (var i = 1; i < staticClasses.length + 1; i++) {
+            if (document.getElementById(i+"").checked){
+                choseClassesID = choseClassesID + i + ";";
+            }
+        }
+        $.ajax({
+            url:"/chooseClasses",
+            dataType:"json",
+            data:{"studentAccount":studentAccount,"classesID":choseClassesID},
+            type:"post",
+            success:function () {
+                alert("选课成功");
+            },
+            error:function () {
+                alert("选课失败");
+            }
+        })
+    }
+    {
+        function changePage() {
+            window.location.href = "main.html";
+        }
+    }
+</script>
+</html>

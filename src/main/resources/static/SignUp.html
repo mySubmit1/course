@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style type="text/css">
+    body{
+        background: url("background.jpg");
+    }
+    #login{
+        text-align:center;
+        vertical-align:middle;
+        width: 50%;
+        position: absolute;
+        top: 20%;
+        left: 25%;
+        word-spacing: 300px;
+    }
+</style>
+<body>
+<div id="login">
+    密码：<input type="password" id="password"><br>
+    性别：<input type="radio" id="sex" name="sex" value="MAN">男<input type="radio" name="sex" value="WOMAN">女<br>
+    姓名：<input type="text" id="name"><br>
+    班级：<input type="text" id="class"><br>
+    年纪：<select name="grade" id="grade"></select><br>
+    <input type="submit" value="提交" onclick="submit()">
+</div>
+</body>
+<script type="text/javascript" src="jquery-3.4.0.min.js"></script>
+<script type="text/javascript">
+    var grade = document.getElementById('grade');
+    var i = 0;
+    var option;
+    var text;
+    for (var year = new Date().getFullYear() - 4;i < 4;year++,i++)
+    {
+        text = document.createTextNode(year);
+        option = document.createElement("option");
+        option.appendChild(text);
+        grade.appendChild(option);
+    }
+    function submit() {
+        var password = document.getElementById('password').value;
+        var name = document.getElementById('name').value;
+        var sex = document.getElementById('sex').value;
+        var grade = document.getElementById('grade').value;
+        var studentClass = document.getElementById('class').value;
+        $.ajax({
+            type:"post",
+            url:"/signUp",
+            dataType:"json",
+            data:{"studentPassword":password,"studentName":name,"studentSex":sex,"studentGrade":grade,"studnetClass":studentClass},
+            success:function (data) {
+                alert("你的账户为:"+data);
+                window.location.href = "signIn.html";
+            },
+            error:function () {
+                alert("注册失败");
+            }
+        });
+    }
+</script>
+</html>

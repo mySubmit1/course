@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="jquery-3.4.0.min.js"></script>
+    <script type="text/javascript">
+        function submit() {
+            var account = document.getElementById("account").value;
+            var password = document.getElementById("password").value;
+            $.ajax({
+                data:{"studentAccount":account,"studentPassword":password},
+                dataType:"JSON",
+                url:"/signIn",
+                type:"post",
+                success:function (data) {
+                    if (data == true) {
+                        alert("登录成功");
+                        window.location.href = "Main.html";
+                    }
+                    else {
+                        alert("登陆失败")
+                    }
+                },
+                error:function () {
+                    alert("登录失败");
+                }
+            });
+        };
+    </script></head>
+<style type="text/css">
+    body{
+        background: url("background.jpg");
+    }
+    #login{
+        text-align:center;
+        vertical-align:middle;
+        width: 50%;
+        position: absolute;
+        top: 20%;
+        left: 30%;
+        word-spacing: 300px;
+    }
+</style>
+<body>
+<div  id="login">
+    账号：<input type="text" id="account" style="width: 50%"><br>
+    密码：<input type="password" id="password" style="width: 50%"><br>
+    <a href="">忘记密码</a>
+    <a href="SignUp.html">注册账号</a><br>
+    <input type="button" value="登录" onclick="submit()">
+</div>
+</body>
+</html>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    body{
+        background-image: url("background2.jpg");
+    }
+    #student{
+        position: absolute;
+        top: 10%;
+        left: 10%;
+    }
+    #class{
+        position: absolute;
+        top: 10%;
+        left: 60%;
+    }
+</style>
+<body>
+<div id="student">
+    <input value="删除用户" type="button" onclick="deleteUser()">
+    <table border="1" width="100%">
+        <tr align="center">
+            <td colspan="2">学生信息</td>
+        </tr>
+        <tr>
+            <td width="50%">学生ID</td>
+            <td width="50%" id="studentID"></td>
+        </tr>
+        <tr>
+            <td width="50%">学生姓名</td>
+            <td width="50%" id="studentName"></td>
+        </tr>
+        <tr>
+            <td width="50%">学生账户</td>
+            <td width="50%" id="studentAccount"></td>
+        </tr>
+        <tr>
+            <td width="50%">学生性别</td>
+            <td width="50%" id="studentSex"></td>
+        </tr>
+        <tr>
+            <td width="50%">学生班级</td>
+            <td width="50%" id="studentClass"></td>
+        </tr>
+        <tr>
+            <td width="50%">学生年纪</td>
+            <td width="50%" id="studentGrade"></td>
+        </tr>
+    </table>
+    <input type="button" onclick="changePage()" value="选课" width="20%">
+</div>
+<div id="class">
+    <table border="1" width="100%" id="classesTable">
+        <tr align="center">
+            <td colspan="7">课程表</td>
+        </tr>
+        <tr>
+            <td>星期一</td>
+            <td>星期二</td>
+            <td>星期三</td>
+            <td>星期四</td>
+            <td>星期五</td>
+            <td>星期六</td>
+            <td>星期日</td>
+        </tr>
+    </table>
+</div>
+</body>
+<script type="text/javascript" src="jquery-3.4.0.min.js"></script>
+<script type="text/javascript">
+    var staticStudentData;
+    var staticClasses = [];
+    {
+        $.ajax({
+            async:false,
+            url:"/getStudentData",
+            type:"post",
+            success:function (studentData) {
+                staticStudentData = studentData[0];
+                for (var i = 1; i < studentData.length; i++) {
+                    staticClasses[i-1] = studentData[i];
+                }
+            },
+            error:function () {
+                alert("访问失败");
+            }
+        });
+    }
+    //显示学生信息
+    {
+        var studentID = document.getElementById("studentID");
+        var studentName = document.getElementById("studentName");
+        var studentAccount = document.getElementById("studentAccount");
+        var studentSex = document.getElementById("studentSex");
+        var studentClass = document.getElementById("studentClass");
+        var studentGrade = document.getElementById("studentGrade");
+        studentID.appendChild(document.createTextNode(staticStudentData.studentID));
+        studentName.appendChild(document.createTextNode(staticStudentData.studentName));
+        studentAccount.appendChild(document.createTextNode(staticStudentData.studentAccount));
+        studentSex.appendChild(document.createTextNode(staticStudentData.studentSex));
+        studentGrade.appendChild(document.createTextNode(staticStudentData.studentGrade));
+        studentClass.appendChild(document.createTextNode(staticStudentData.studentClass));
+    }
+    //显示现有课程信息
+    {
+        var classesTable = document.getElementById("classesTable");
+        var time = 1;
+        for (var i = 0; i < 4; i++) {
+            var classTR = document.createElement("tr");
+            var classTD = [];
+            for (var j = 0; j < 7; j++) {
+                classTD[j] = document.createElement("td");
+                for (var k = 0; k < staticClasses.length; k++) {
+                    if (staticClasses[k].courseTime == time) {
+                        classTD[j].appendChild(document.createTextNode(staticClasses[k].courseName));
+                    }
+                }
+                time = time + 4;
+                classTR.appendChild(classTD[j]);
+            }
+            time = 2;
+            classesTable.appendChild(classTR);
+        }
+
+        //跳转页面
+        function changePage() {
+            window.location.href = "chooseClasses.html";
+        }
+    }
+    function deleteUser() {
+        $.ajax({
+            type:"post",
+            url:"/deleteUser",
+            data:{"studentAccount":staticStudentData.studentAccount},
+            success:function () {
+                alert("用户已注销");
+                window.location.href = "signIn.html";
+            },
+            error:function () {
+                alert("删除失败");
+            }
+        })
+    }
+</script>
+</html>
